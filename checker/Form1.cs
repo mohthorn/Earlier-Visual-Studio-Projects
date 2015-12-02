@@ -21,6 +21,8 @@ namespace checker
             AddPictureBox();
             
         }
+
+
         private int AiGo()
         {
             int n = 0;
@@ -37,6 +39,8 @@ namespace checker
             }
             return n;
         }
+
+
         private void button1_Click(object sender, EventArgs e)
         {
             int n;
