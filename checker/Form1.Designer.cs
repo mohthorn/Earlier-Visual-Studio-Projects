@@ -30,6 +30,13 @@
         {
             this.inputButton = new System.Windows.Forms.Button();
             this.inputText = new System.Windows.Forms.TextBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nimaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.debuggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.debuggingToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // inputButton
@@ -49,6 +56,53 @@
             this.inputText.Size = new System.Drawing.Size(174, 25);
             this.inputText.TabIndex = 1;
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuToolStripMenuItem,
+            this.debuggingToolStripMenuItem,
+            this.clearToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1008, 28);
+            this.menuStrip1.TabIndex = 2;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // menuToolStripMenuItem
+            // 
+            this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.nimaseToolStripMenuItem});
+            this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
+            this.menuToolStripMenuItem.Size = new System.Drawing.Size(63, 24);
+            this.menuToolStripMenuItem.Text = "Menu";
+            // 
+            // nimaseToolStripMenuItem
+            // 
+            this.nimaseToolStripMenuItem.Name = "nimaseToolStripMenuItem";
+            this.nimaseToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.nimaseToolStripMenuItem.Text = "&Nimase";
+            // 
+            // debuggingToolStripMenuItem
+            // 
+            this.debuggingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.debuggingToolStripMenuItem1});
+            this.debuggingToolStripMenuItem.Name = "debuggingToolStripMenuItem";
+            this.debuggingToolStripMenuItem.Size = new System.Drawing.Size(102, 24);
+            this.debuggingToolStripMenuItem.Text = "debugging";
+            // 
+            // debuggingToolStripMenuItem1
+            // 
+            this.debuggingToolStripMenuItem1.Name = "debuggingToolStripMenuItem1";
+            this.debuggingToolStripMenuItem1.Size = new System.Drawing.Size(181, 26);
+            this.debuggingToolStripMenuItem1.Text = "&debugging";
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(58, 24);
+            this.clearToolStripMenuItem.Text = "Clear";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -56,8 +110,13 @@
             this.ClientSize = new System.Drawing.Size(1008, 526);
             this.Controls.Add(this.inputText);
             this.Controls.Add(this.inputButton);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -67,6 +126,12 @@
 
         private System.Windows.Forms.Button inputButton;
         private System.Windows.Forms.TextBox inputText;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nimaseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem debuggingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem debuggingToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
     }
 }
 
