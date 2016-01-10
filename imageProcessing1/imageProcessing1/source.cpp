@@ -13,7 +13,7 @@ int main()
 {
 	String pics[8] = { "Art1","Bowling1","cones","Dolls","Flowerpots","Laundry1","Moebius1","teddy" };
 	double m[100][100];		//mask
-	double k = 5; //确定kernel
+	double k = 6; //确定kernel
 	/*cin >> k;*/
 	double w = 0;
 	for (int i = 0; i < 2 * k + 1; i++)
@@ -44,6 +44,7 @@ int main()
 		String s1 = "imgs/" + pics[ii] + ".bmp";//读图
 		String s2= "imgs/" + pics[ii] + "_depth.bmp";
 		Mat img = imread(s1);	//彩色原图
+		Mat img1 = imread(s1);
 		Mat dimg = imread(s2,0);	//深度图
 		Mat dimg2 = imread(s2);		//两个单通道图用于高斯滤波的计算，
 		Mat dimg3 = imread(s2,0);	//一个RGB图用于图片的加减运算
@@ -54,6 +55,11 @@ int main()
 		if (img.empty())			//错误检查
 		{
 			cout << "error";
+			return -1;
+		}
+		if (img1.empty())			//错误检查
+		{
+			cout << "i1error";
 			return -1;
 		}
 		if (dimg.empty())
@@ -123,6 +129,10 @@ int main()
 		img -= (1.4 * DD);
 		String s3= "imgs/" + pics[ii] + "_out.bmp";
 		imwrite(s3, img);
+
+		dimg2 = img1 - img;
+		String s6 = "imgs/" + pics[ii] + "_diff2.bmp";
+		imwrite(s6, dimg2);
 	}
 	//waitKey();
 
