@@ -122,7 +122,7 @@ Mat mbilateral(Mat in, int k, int sigmad, int sigmar)
 	for (int p = 0; p < 2 * k + 1; p++)
 		for (int q = 0; q < 2 * k + 1; q++)
 		{
-			m[p][q]= (q - k)*(q - k) + (p - k)*(p - k);
+			m[p][q]= (q - k)*(q - k) + (p - k)*(p - k);		//先计算距离mask的值，因为为固定值，不需要多次计算
 		}
 	Mat out(in.rows, in.cols, CV_8UC1,Scalar(0));
 
@@ -150,33 +150,22 @@ Mat mbilateral(Mat in, int k, int sigmad, int sigmar)
 						nq = -nq;
 					if (nq > in.cols - 1)
 						nq = in.cols - 1 - (nq - in.cols + 1);
-					//uchar ndij = dimg.at<uchar>(ni, nj);
 
 					int inte = (in.at<uchar>(np, nq) - in.at<uchar>(i, j))*(in.at<uchar>(np, nq) - in.at<uchar>(i, j));
-					
-
+					//灰度差异矩阵的值
 					double bf=exp(-(double)dis/(2.0*sigmad*sigmad))*exp(-(double)inte/(2.0*sigmar*sigmar));
 					sum += bf;
+					//sum表示ks
 					bf *= in.at<uchar>(np, nq);
 					sum2 += bf;		//计算卷积
+					//sum2表示ks*BF
 
 				}
 
 			}
-			sum = sum2 / sum;
+			sum = sum2 / sum;//得到BF图一点的值
 			out.at<uchar>(i, j) = (uchar)sum;
-			//for (int i = 0; i < 2 * k + 1; i++)
-			//{
 
-			//	for (int j = 0; j < 2 * k + 1; j++)
-			//	{
-
-			//		m[i][j] /= (0.999*w);		//修正可能的浮点数误差，尽量靠近1
-			//									//cout << m[i][j] << " ";
-			//	}
-			//	//cout << endl;
-
-			//}
 		}
 	return out;
 }
@@ -201,6 +190,8 @@ int main()
 	Mat imgIB(imgI.rows, imgI.cols, CV_8UC1);
 	Mat imgICIE(imgI.rows, imgI.cols, CV_8UC1);
 	Mat imgIS(imgI.rows, imgI.cols, CV_8UC1);
+
+	Mat mask = imread("input1/face.bmp",0);		//单通道的掩码，用于选择化妆部分，如脸、嘴唇、眼睛等
 	if (img.empty())
 	{
 		cout << "error";
@@ -210,12 +201,13 @@ int main()
 	//imgCIE=RGB2Lab(imgCIE);
 	//cvtColor(imgCIE, imgCIE, CV_Lab2RGB);
 	//imshow("out", imgCIE);
+
 	cvtColor(img, imgCIE, CV_RGB2Lab);		//颜色空间转换
 	cvtColor(imgI, imgICIE, CV_RGB2Lab);
 	for (int i = 0; i < imgCIE.rows; i++)
 		for (int j = 0; j < imgCIE.cols; j++)
 		{
-			imgL.at<uchar>(i, j) = imgCIE.at<Vec3b>(i, j)[0];
+			imgL.at<uchar>(i, j) = imgCIE.at<Vec3b>(i, j)[0];			//取得Lab三层
 			imgA.at<uchar>(i, j) = imgCIE.at<Vec3b>(i, j)[1];
 			imgB.at<uchar>(i, j) = imgCIE.at<Vec3b>(i, j)[2];
 		}
@@ -226,7 +218,7 @@ int main()
 			imgIA.at<uchar>(i, j) = imgICIE.at<Vec3b>(i, j)[1];
 			imgIB.at<uchar>(i, j) = imgICIE.at<Vec3b>(i, j)[2];
 		}
-	cvtColor(imgCIE, imgCIE, CV_Lab2RGB);
+	//cvtColor(imgCIE, imgCIE, CV_Lab2RGB);
 	//imwrite(s1+CIE, imgCIE);
 	imwrite(s1+L, imgL);
 	imwrite(s1+A, imgA);
@@ -234,43 +226,66 @@ int main()
 	imwrite(s2+L, imgIL);
 	imwrite(s2+A, imgIA);
 	imwrite(s2+B, imgIB);
-	bilateralFilter(imgL,imgS,-1,10,10);			//双边滤波
-	imwrite(s1 + "SO.bmp", imgS);
-	//bilateralFilter(imgIL, imgIS, -1, 20, 20);
-		//双边滤波库函数
+	bilateralFilter(imgL,imgS,-1,20,20);			//双边滤波（库函数）
+	imwrite(s1 + "SO.bmp", imgS);				//存储用以比较差异
 
-	bilateralFilter(imgIL, imgIS, -1, 10, 10);
+
+	bilateralFilter(imgIL, imgIS, -1, 20, 20);	
 	imwrite(s2 + "SO.bmp", imgIS);
 
-	imgS = mbilateral(imgL, 9, 10, 10);		//手写双边滤波
-	imgIS = mbilateral(imgIL, 9, 10, 10);
+	imgS = mbilateral(imgL, 19, 20, 20);		//手写双边滤波，取与库函数中相近的参数
+	imgIS = mbilateral(imgIL, 19, 20, 20);
 
 
 	Mat imgD(img.rows, img.cols, CV_16SC1);
 	Mat imgID(img.rows, img.cols, CV_16SC1);
-	Mat Rd(img.rows, img.cols, CV_8UC1);
-	Mat Ra(img.rows, img.cols, CV_8SC1);
-	Mat Rl(img.rows, img.cols, CV_8SC1);
-	Mat Rs(img.rows, img.cols, CV_8SC1);
-	Mat Rb(img.rows, img.cols, CV_8SC1);
+	Mat Rd(img.rows, img.cols, CV_16SC1);
+	Mat Ra(img.rows, img.cols, CV_8UC1);
+	Mat Rl(img.rows, img.cols, CV_8UC1);
+	Mat Rs(img.rows, img.cols, CV_8UC1);
+	Mat Rb(img.rows, img.cols, CV_8UC1);
 
+	///***************post processing*****************************************/
+	//Mat imgA= imread(s1 + A,0);
+	//Mat imgB=imread(s1+B,0);
+	//Mat imgIA = imread(s2 + A,0);
+	//Mat imgIB = imread(s2 + B,0);
+	//Mat imgD=imread(s1+"D.bmp",0);
+	//Mat imgID= imread(s2 + "D.bmp",0);
+	//Mat Rd(imgD.rows, imgD.cols, CV_16SC1);
+	//Mat Ra(imgD.rows, imgD.cols, CV_8UC1);
+	//Mat Rl(imgD.rows, imgD.cols, CV_8UC1);
+	//Mat Rs(imgD.rows, imgD.cols, CV_8UC1);
+	//Mat Rb(imgD.rows, imgD.cols, CV_8UC1);
+	////*********************************************post
 	imgD = imgL - imgS;
-	imgID = imgIL - imgIS;
+	imgID = imgIL - imgIS;					//细节信息D
 	imwrite(s1 + "S.bmp", imgS);
 	imwrite(s2 + "S.bmp", imgIS);
 
 
-	Rd = 0.8*imgID + 0.2*imgD;
+	Rd = 0.8*imgID + 0.2*imgD;				//结果中的细节信息
 	imwrite("input1/Rd.bmp", Rd);
-	Rs = imgIS;
+	Rs = imgIS;								//I脸部结构图像
 	Rl = Rd + Rs;
 	imwrite("input1/Rl.bmp", Rl);
-	double c=0.8;
-	Ra = c*imgA + (1 - c)*imgIA;
+	double c=0.8;						//a，b合成时的伽马值取0.8
+	Mat imgONE(imgD.rows, imgD.cols, CV_8UC1, Scalar(1));		//“单位图”用以实现部分功能
+	//imshow("IA", imgIA);
+
+	Ra = c*imgA + (1 - c)*imgIA;			//Ra，Rb的计算，后两步为通过掩码进行修正，即白处合成，黑处不变
+	Ra = Ra - (255*imgONE - mask);
+	Ra += (imgIA - mask);
 	imwrite("input1/Ra.bmp", Ra);
+
 	Rb = c*imgB+(1 - c)*imgIB;
+	Rb = Rb - (255*imgONE - mask);
+	Rb += (imgIB - mask);
 	imwrite("input1/Rb.bmp", Rb);
-	Mat R(img.rows, img.cols, CV_8UC3);
+
+
+	Mat R(imgD.rows, imgD.cols, CV_8UC3);
+	
 	for (int i = 0; i < R.rows; i++)
 		for (int j = 0; j < R.cols; j++)
 		{
@@ -278,10 +293,10 @@ int main()
 			R.at<Vec3b>(i, j)[1] = Ra.at<uchar>(i, j);
 			R.at<Vec3b>(i, j)[2] = Rb.at<uchar>(i, j);
 		}
-	cvtColor(R, R, CV_Lab2RGB);
+	cvtColor(R, R, CV_Lab2RGB);				//转回RGB空间
 
-	Mat imgONE(img.rows, img.cols, CV_8UC1, Scalar(1));
-	imgD = imgD + 128 * imgONE;
+	
+	imgD = imgD + 128 * imgONE;				//因为细节部分亮度太弱，提升128的像素值可以看的清楚一些，并没有改变像素的差异
 	imgID = imgID + 128 * imgONE;
 	imwrite(s1 + "D.bmp", imgD);
 	imwrite(s2 + "D.bmp", imgID);
