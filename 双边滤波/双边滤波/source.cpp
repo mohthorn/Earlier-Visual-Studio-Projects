@@ -9,15 +9,15 @@ using namespace std;
 //int x[700][700];
 //int y[700][700];
 //int z[700][700];
-double f(double t)
+double f(double t)					//用于XYZ转Lab
 {
 	if (t > pow(3.0/ 69, (3.0)))
 		return pow(t, (1.0 / 3.0));
 	else
 		return (1.0 / 3.0*pow(29.0 / 6.0, 2.0) + 4.0 / 29.0);
-}
+}			
 
-double g(double t)
+double g(double t)					//gamma矫正，用于RGB转XYZ
 {
 	if (t > 0.04045)
 		return pow((t + 0.055) / 1.055, 2.4);
@@ -25,7 +25,7 @@ double g(double t)
 		return t*1.0 / 12.92;
 }
 
-Mat RGB2Lab(Mat in)
+Mat RGB2Lab(Mat in)					//尝试RGB转Lab，未成功实现，未采用
 {
 	Mat out(in.rows,in.cols,CV_8UC3);
 	Mat x(in.rows, in.cols, CV_8UC1,Scalar(0));
@@ -116,7 +116,7 @@ Mat RGB2Lab(Mat in)
 	return out;
 }
 
-Mat mbilateral(Mat in, int k, int sigmad, int sigmar)
+Mat mbilateral(Mat in, int k, int sigmad, int sigmar)		//双边滤波
 {
 	int m[100][100];
 	for (int p = 0; p < 2 * k + 1; p++)
@@ -163,7 +163,7 @@ Mat mbilateral(Mat in, int k, int sigmad, int sigmar)
 				}
 
 			}
-			sum = sum2 / sum;//得到BF图一点的值
+			sum = sum2 / sum;//得到BF图s一点的值
 			out.at<uchar>(i, j) = (uchar)sum;
 
 		}
@@ -197,10 +197,7 @@ int main()
 		cout << "error";
 		return -1;
 	}
-	//imshow("RGB", imgCIE);
-	//imgCIE=RGB2Lab(imgCIE);
-	//cvtColor(imgCIE, imgCIE, CV_Lab2RGB);
-	//imshow("out", imgCIE);
+
 
 	cvtColor(img, imgCIE, CV_RGB2Lab);		//颜色空间转换
 	cvtColor(imgI, imgICIE, CV_RGB2Lab);
@@ -218,8 +215,7 @@ int main()
 			imgIA.at<uchar>(i, j) = imgICIE.at<Vec3b>(i, j)[1];
 			imgIB.at<uchar>(i, j) = imgICIE.at<Vec3b>(i, j)[2];
 		}
-	//cvtColor(imgCIE, imgCIE, CV_Lab2RGB);
-	//imwrite(s1+CIE, imgCIE);
+
 	imwrite(s1+L, imgL);
 	imwrite(s1+A, imgA);
 	imwrite(s1+B, imgB);
@@ -245,19 +241,7 @@ int main()
 	Mat Rs(img.rows, img.cols, CV_8UC1);
 	Mat Rb(img.rows, img.cols, CV_8UC1);
 
-	///***************post processing*****************************************/
-	//Mat imgA= imread(s1 + A,0);
-	//Mat imgB=imread(s1+B,0);
-	//Mat imgIA = imread(s2 + A,0);
-	//Mat imgIB = imread(s2 + B,0);
-	//Mat imgD=imread(s1+"D.bmp",0);
-	//Mat imgID= imread(s2 + "D.bmp",0);
-	//Mat Rd(imgD.rows, imgD.cols, CV_16SC1);
-	//Mat Ra(imgD.rows, imgD.cols, CV_8UC1);
-	//Mat Rl(imgD.rows, imgD.cols, CV_8UC1);
-	//Mat Rs(imgD.rows, imgD.cols, CV_8UC1);
-	//Mat Rb(imgD.rows, imgD.cols, CV_8UC1);
-	////*********************************************post
+
 	imgD = imgL - imgS;
 	imgID = imgIL - imgIS;					//细节信息D
 	imwrite(s1 + "S.bmp", imgS);
