@@ -128,11 +128,11 @@ void Fight(Ava First, Ava Second, int(&value)[AvaNum], int i, int j);
 void EvolutionaryComputing()
 {
 	int maxposition = 0;
-	double pMutant = 0.1,pRecomb=1;
+	double pMutant = 0.1,pRecomb=1;			//突变，重组概率
 	ofstream out("out.txt");
 	ofstream out2("superout.txt");
 	WS ws[AvaNum];
-	init(ws);
+	init(ws);								//初始化
 	Ava Avaarray[AvaNum] ;
 
 	int value[AvaNum] = {0};
@@ -165,8 +165,6 @@ void EvolutionaryComputing()
 		ws[AvaNum - 1].pos += 0.1;					//修正使最后一项的值大于0.1
 
 
-
-
 		//选择
 		int elite = AvaNum/2;
 		WS wsE[AvaNum / 2];
@@ -182,7 +180,6 @@ void EvolutionaryComputing()
 					break;
 				}
 			}
-
 		}
 		for (int i = 0; i < elite; i++)				//复制回到ws
 		{
@@ -195,7 +192,6 @@ void EvolutionaryComputing()
 			int b = getRand(elite-1);
 			ws[2*i+elite]=recombine(ws[a],ws[b]);
 			ws[2*i + elite + 1] = recombine(ws[b],ws[a]);
-
 		}
 		//突变
 		for (int i = elite; i < AvaNum; i++)		//AvaNum-elite次突变
@@ -222,8 +218,7 @@ void EvolutionaryComputing()
 		{
 			out << "score:" << ws[i].score << endl;
 			if (ws[i].score > ws[maxposition].score)
-			{
-				
+			{				
 				maxposition = i;
 			}
 			for (int j = 0; j < ws[i].size; j++)
@@ -231,11 +226,8 @@ void EvolutionaryComputing()
 				out << ws[i].w[j]<<" ";				
 			}
 			out << endl;
-		}
-
-
-		
-	}
+		}		
+	}										//一次迭代
 
 	//输出结果
 	out2 << ws[maxposition].score << endl;
@@ -243,10 +235,7 @@ void EvolutionaryComputing()
 	{
 		out2 << ws[maxposition].w[i] << " ";
 	}
-	//for (int i = 0; i < AvaNum; i++)
-	//{
-	//	cout << value[i] << " ";
-	//}
+
 	//把最优的神经网络写到文件里面去
 }
 
