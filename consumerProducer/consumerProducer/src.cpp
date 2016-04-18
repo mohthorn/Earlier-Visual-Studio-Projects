@@ -1,6 +1,4 @@
-//1生产者 1消费者 1缓冲区
-//使用二个事件，一个表示缓冲区空，一个表示缓冲区满。
-//再使用一个关键段来控制缓冲区的访问
+
 #include <stdio.h>
 #include <process.h>
 #include <windows.h>
@@ -29,8 +27,9 @@ HANDLE semaphoreBufferEmpty, semaphoreBufferFull;
 //生产者线程函数
 unsigned int __stdcall ProducerThreadFun(PVOID pM)
 {
-	Sleep((rand() + GetCurrentThreadId()) % 5000);
-	srand((unsigned)time(NULL));
+	srand((unsigned)time(NULL)+GetCurrentThreadId());
+	Sleep((rand()) % 5000);
+	
 	char item;
 	for (int i = 0; i < END_PRODUCE_NUMBER; i++)
 	{
@@ -57,8 +56,8 @@ unsigned int __stdcall ProducerThreadFun(PVOID pM)
 //消费者线程函数
 unsigned int __stdcall ConsumerThreadFun(PVOID pM)
 {
-	Sleep((rand() + GetCurrentThreadId()) % 5000);
-	srand((unsigned)time(NULL));
+	srand((unsigned)time(NULL) + GetCurrentThreadId());
+	Sleep((rand()) % 5000);
 	int i;
 	char item;
 //	volatile bool flag = true;
@@ -73,7 +72,7 @@ unsigned int __stdcall ConsumerThreadFun(PVOID pM)
 		int currentout = nextout;
 		item = g_Buffer[nextout++];
 		nextout = nextout%BSIZE;
-//		nextin = (nextin - 1) % BSIZE;
+
 		g_Buffer[currentout] = '$';
 		printf("  消费者%d从缓冲区中取数据%c\n",GetCurrentThreadId(), item);
 		for (int j = 0; j < BSIZE; j++)
@@ -92,7 +91,7 @@ int main()
 {
 	int i;
 	srand((unsigned)time(NULL));	
-//	printf("  生产者消费者问题   1生产者 1消费者 1缓冲区\n");
+
 
 	InitializeCriticalSection(&g_cs);	//初始化临界区
 	//创建二个自动复位事件，一个表示缓冲区是否为空，另一个表示缓冲区是否已经处理
@@ -111,8 +110,8 @@ int main()
 		hThread[i] = (HANDLE)_beginthreadex(NULL, 0, ConsumerThreadFun, NULL, 0, NULL);
 	}
 	WaitForMultipleObjects(THREADNUM, hThread, TRUE, INFINITE);
-	CloseHandle(hThread[0]);
-	CloseHandle(hThread[1]);
+	for (i = 0; i < 7;i++)
+		CloseHandle(hThread[i]);
 
 	//销毁事件和关键段
 	CloseHandle(semaphoreBufferEmpty);
